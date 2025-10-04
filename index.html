@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 3 - Advanced Styling & JavaScript</title>
+  <style>
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e3f2fd);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #007BFF;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.2);}
+
+    h2 {margin-bottom: 15px; color: #007BFF; font-size: 22px;}
+    p {margin-bottom: 15px;}
+
+    button {
+      padding: 12px 18px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin: 5px 0;
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+    button:hover {background: #0056b3;}
+
+    #next-btn, #restart-btn {
+      display: none;
+      background: #28a745;
+      margin-top: 15px;
+      width: auto;
+      text-align: center;
+    }
+    #next-btn:hover, #restart-btn:hover {background: #1e7e34;}
+
+    .success {color: green; font-weight: bold;}
+    .error {color: red; font-weight: bold;}
+
+    @media (max-width: 768px) {
+      header {font-size: 20px; padding: 15px;}
+      button {font-size: 14px; padding: 10px 14px;}
+    }
+
+    @media (max-width: 480px) {
+      header {font-size: 18px;}
+      .card {padding: 20px;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🌐 Task 3 - Advanced Styling & JavaScript
+  </header>
+
+  <div class="container">
+    <!-- MULTIPLE QUESTION QUIZ -->
+    <div class="card">
+      <h2>🎯 Interactive Quiz</h2>
+      <p id="question">Loading question...</p>
+      <div id="options"></div>
+      <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+      <button id="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+      <p id="quiz-result"></p>
+    </div>
+
+    <!-- API CARD -->
+    <div class="card">
+      <h2>😂 Random Joke (API)</h2>
+      <p id="joke">Click the button to fetch a random joke!</p>
+      <button onclick="getJoke()">Get Joke</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- QUIZ DATA (5 QUESTIONS) ----------
+    const quizData = [
+      {
+        question: "What is the capital of France?",
+        options: ["Paris", "London", "Berlin"],
+        answer: "Paris"
+      },
+      {
+        question: "Which language is used for styling web pages?",
+        options: ["HTML", "CSS", "Python"],
+        answer: "CSS"
+      },
+      {
+        question: "Which language is primarily used for web development?",
+        options: ["JavaScript", "C++", "Java"],
+        answer: "JavaScript"
+      },
+      {
+        question: "Which HTML tag is used to display images?",
+        options: ["<img>", "<image>", "<src>"],
+        answer: "<img>"
+      },
+      {
+        question: "What does CSS stand for?",
+        options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style System"],
+        answer: "Cascading Style Sheets"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("quiz-result");
+    const nextBtn = document.getElementById("next-btn");
+    const restartBtn = document.getElementById("restart-btn");
+
+    // Load a question
+    function loadQuestion() {
+      let q = quizData[currentQuestion];
+      questionEl.innerText = q.question;
+      optionsEl.innerHTML = "";
+      q.options.forEach(opt => {
+        let btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, q.answer);
+        optionsEl.appendChild(btn);
+      });
+      resultEl.innerText = "";
+      nextBtn.style.display = "none";
+    }
+
+    // Check answer
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        resultEl.innerHTML = "✅ Correct!";
+        resultEl.className = "success";
+        score++;
+      } else {
+        resultEl.innerHTML = "❌ Wrong! Correct answer: " + correct;
+        resultEl.className = "error";
+      }
+      nextBtn.style.display = "inline-block";
+    }
+
+    // Load next question
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showFinalResult();
+      }
+    }
+
+    // Show final result
+    function showFinalResult() {
+      questionEl.innerText = "Quiz Completed!";
+      optionsEl.innerHTML = "";
+      resultEl.innerHTML = `🎉 You scored ${score} out of ${quizData.length}`;
+      resultEl.className = "success";
+      nextBtn.style.display = "none";
+      restartBtn.style.display = "inline-block";
+    }
+
+    // Restart quiz
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      restartBtn.style.display = "none";
+      loadQuestion();
+    }
+
+    // Start quiz
+    loadQuestion();
+
+    // ---------- API FETCH FUNCTION ----------
+    async function getJoke() {
+      let jokeBox = document.getElementById("joke");
+      try {
+        let response = await fetch("https://official-joke-api.appspot.com/random_joke");
+        let data = await response.json();
+        jokeBox.innerHTML = `😂 ${data.setup} <br> 👉 ${data.punchline}`;
+      } catch (error) {
+        jokeBox.innerHTML = "❌ Failed to fetch joke. Try again!";
+      }
+    }
+  </script>
+</body>
+</html>
